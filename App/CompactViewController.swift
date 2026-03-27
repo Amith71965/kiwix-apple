@@ -30,6 +30,7 @@ struct CompactTabView: View {
     @EnvironmentObject private var library: LibraryViewModel
     @State private var presentedSheet: PresentedSheet?
     @ObservedObject private var browser: BrowserViewModel
+    @StateObject private var tts = TTSController()
     @FocusedValue(\.hasZIMFiles) var hasZimFiles
     private let navigateToHotspotSettings = NotificationCenter.default.publisher(for: .navigateToHotspotSettings)
     private let hotspotShareURL = NotificationCenter.default.publisher(for: .hotspotShareURL)
@@ -107,6 +108,17 @@ struct CompactTabView: View {
                               presentHotspot: {
                     presentedSheet = .customHotspot
                 })
+                SpacerBackCompatible()
+                Button {
+                    if tts.isActive {
+                        tts.stop()
+                    } else {
+                        tts.start(from: browser.webView)
+                    }
+                } label: {
+                    Image(systemName: tts.isActive ? "speaker.slash" : "speaker.wave.2")
+                }
+                .disabled(browser.zimFileName.isEmpty)
                 Spacer()
             }
         }
